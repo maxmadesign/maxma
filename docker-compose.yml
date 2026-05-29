@@ -1,0 +1,132 @@
+# TradePilot Arena — local one-command stack:  docker compose up -d
+# Dashboard http://localhost:3000 · API http://localhost:8000 · Docs /docs
+name: tradepilot-arena
+
+x-api-env: &api-env
+  DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://tradepilot:tradepilot@postgres:5432/tradepilot}
+  REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+  APP_SECRET_KEY: ${APP_SECRET_KEY:-dev-only-change-me}
+  LOCAL_ADMIN_PASSWORD: ${LOCAL_ADMIN_PASSWORD:-tradepilot}
+  LIVE_TRADING_ENABLED: ${LIVE_TRADING_ENABLED:-false}
+  PAPER_TRADING: ${PAPER_TRADING:-true}
+  DEMO_MODE: ${DEMO_MODE:-true}
+  DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-zh-CN}
+  DEFAULT_THEME: ${DEFAULT_THEME:-system}
+  MONTHLY_AI_BUDGET_USD: ${MONTHLY_AI_BUDGET_USD:-50}
+  DECISION_INTERVAL_SECONDS: ${DECISION_INTERVAL_SECONDS:-300}
+  OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+  GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+  DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tradepilot
+      POSTGRES_PASSWORD: tradepilot
+      POSTGRES_DB: tradepilot
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tradepilot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "6379:6379"
+
+  api:
+    build:
+      context: .
+      dockerfile: infra/docker/api.Dockerfile
+    restart: unless-stopped
+    command: ["uvicorn", "tradepilot.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      <<: *api-env
+    volumes:
+      - app_logs:/var/log/tradepilot
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  agent-runner:
+    build:
+      context: .
+      dockerfile: infra/docker/api.Dockerfile
+    restart: unless-stopped
+    command: ["python", "-m", "services.agent_runner.main"]
+    environment:
+      <<: *api-env
+    volumes:
+      - app_logs:/var/log/tradepilot
+    depends_on:
+      api:
+        condition: service_started
+
+  market-data:
+    build:
+      context: .
+      dockerfile: infra/docker/api.Dockerfile
+    restart: unless-stopped
+    command: ["python", "-m", "services.market_data.main"]
+    environment:
+      <<: *api-env
+    volumes:
+      - market_data_cache:/var/cache/tradepilot
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  simulation-engine:
+    build:
+      context: .
+      dockerfile: infra/docker/api.Dockerfile
+    restart: unless-stopped
+    command: ["python", "-m", "services.simulation_engine.main"]
+    environment:
+      <<: *api-env
+    volumes:
+      - app_logs:/var/log/tradepilot
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: infra/docker/web.Dockerfile
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
+      NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-ws://localhost:8000/ws/events}
+    depends_on:
+      api:
+        condition: service_started
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
+  redis_data:
+  app_logs:
+  market_data_cache:

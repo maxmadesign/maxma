@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter", "PingFang SC", "Microsoft YaHei", system-ui;
+
+  /* Light theme — clean and premium */
+  --bg: 210 20% 98%;
+  --surface: 0 0% 100%;
+  --surface-2: 210 20% 96%;
+  --border: 214 20% 90%;
+  --fg: 222 30% 12%;
+  --muted: 215 16% 47%;
+  --accent: 221 83% 53%;
+}
+
+.dark {
+  /* Dark theme — professional trading terminal */
+  --bg: 222 30% 7%;
+  --surface: 222 26% 10%;
+  --surface-2: 222 24% 13%;
+  --border: 222 18% 20%;
+  --fg: 210 30% 96%;
+  --muted: 215 18% 60%;
+  --accent: 217 91% 60%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--bg));
+  color: hsl(var(--fg));
+  font-feature-settings: "tnum" 1, "cv11" 1;
+}
+
+/* Tabular numbers for all financial figures */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
