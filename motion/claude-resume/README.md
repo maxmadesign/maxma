@@ -28,7 +28,8 @@ a `clip-path: circle()` view transition and a shared-element transition.
 
 ## Build
 ```bash
-npm install                      # fonts (OFL) + playwright, matching the preinstalled Chromium
+npm install                      # fonts (OFL) + playwright 1.56
+npx playwright install chromium   # the matching headless browser (skip if PLAYWRIGHT_BROWSERS_PATH already has it)
 npm run preview                  # http://127.0.0.1:5173 — scrub with ←/→, play with space
                                  # (with prefers-reduced-motion, Play shows held key frames; “Full motion” opts in)
                                  # player UI defaults to zh-CN (English systems get en-US); the 中文/EN toggle persists
