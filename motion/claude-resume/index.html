@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Motion Résumé</title>
+    <title>动态简历</title>
     <style>
       @font-face { font-family: 'Inter Tight'; font-weight: 400; src: url(fonts/inter-tight-latin-400-normal.woff2) format('woff2'); }
       @font-face { font-family: 'Inter Tight'; font-weight: 500; src: url(fonts/inter-tight-latin-500-normal.woff2) format('woff2'); }
@@ -35,11 +35,12 @@
     </style>
   </head>
   <body>
-    <div class="stage"><canvas id="c" width="1920" height="1080" aria-label="Motion résumé animation"></canvas></div>
+    <div class="stage"><canvas id="c" width="1920" height="1080" data-i18n-aria="canvasAria" aria-label="动态简历动画"></canvas></div>
     <div class="bar">
-      <button id="play" type="button" aria-label="Play or pause (space)">Play</button>
-      <input id="scrub" type="range" min="0" max="1799" value="0" step="1" aria-label="Frame" />
-      <button id="motion" type="button" hidden aria-pressed="false">Full motion</button>
+      <button id="play" type="button" data-i18n-aria="playAria">播放</button>
+      <input id="scrub" type="range" min="0" max="1799" value="0" step="1" data-i18n-aria="frameAria" />
+      <button id="motion" type="button" hidden aria-pressed="false" data-i18n="fullMotion" data-i18n-aria="fullMotionAria"></button>
+      <button id="lang" type="button" data-i18n="switchTo" data-i18n-aria="switchAria"></button>
       <span class="tc" id="tc">00.000 s · F0000</span>
     </div>
     <!-- fresh checkout: score.wav is a build output, so fall back to the committed Opus copy (then the MP4's AAC track) -->

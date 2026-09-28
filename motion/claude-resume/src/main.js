@@ -1,5 +1,6 @@
 import { FPS, DURATION, setMeasureContext } from './engine.js';
 import { init, renderFrame, cues } from './scenes.js';
+import { t as tr, locale, setLocale, applyStrings } from './i18n.js';
 
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d', { willReadFrequently: true });
@@ -56,6 +57,14 @@ function preview(start) {
   const tc = document.getElementById('tc');
   const audio = document.getElementById('audio');
   let playing = false, t = start, t0 = 0, raf = 0;
+  const label = () => (play.textContent = tr(playing ? 'pause' : 'play'));
+  document.getElementById('lang').addEventListener('click', () => {
+    setLocale(locale === 'zh-CN' ? 'en-US' : 'zh-CN');
+    applyStrings();
+    label();
+  });
+  applyStrings();
+  label();
 
   const show = (time) => {
     t = ((time % DURATION) + DURATION) % DURATION;
@@ -95,7 +104,7 @@ function preview(start) {
   };
   const toggle = () => {
     playing = !playing;
-    play.textContent = playing ? 'Pause' : 'Play';
+    label();
     if (playing && reduced()) {
       stepStill();
       timer = setInterval(stepStill, 2500);
