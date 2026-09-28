@@ -94,6 +94,10 @@ try {
 if (flag('encode')) {
   const wav = path.join(OUT, 'score.wav');
   const hasAudio = fs.existsSync(wav);
+  if (!hasAudio && !flag('no-audio')) {
+    console.error('out/score.wav is missing — run `python audio/score.py` first (or pass --no-audio for a silent encode).');
+    process.exit(1);
+  }
   const name = opt('name', 'claude-motion-resume');
   const mp4 = path.join(OUT, `${name}.mp4`);
   const cmd = [

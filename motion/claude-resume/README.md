@@ -33,7 +33,8 @@ npm run preview                  # http://127.0.0.1:5173 — scrub with ←/→,
                                  # (with prefers-reduced-motion, Play shows held key frames; “Full motion” opts in)
                                  # player UI defaults to zh-CN (English systems get en-US); the 中文/EN toggle persists
 node render.mjs --cues           # export sound cues → audio/cues.json
-python audio/score.py            # numpy + scipy → out/score.wav
+pip install -r audio/requirements.txt
+python audio/score.py            # numpy + scipy → out/score.wav (--encode refuses to run without it)
 node render.mjs --frames --blur 8 && FFMPEG=/path/to/ffmpeg node render.mjs --encode
 ```
 `--blur 8` averages 8 sub-frames over a 180° shutter for true motion blur (about 3 min on 4 cores).
