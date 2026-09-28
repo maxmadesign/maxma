@@ -26,6 +26,7 @@
       button { font: inherit; color: var(--fg); background: #1d1c1a; border: 1px solid #2d2c29; border-radius: 999px; padding: 8px 16px; cursor: pointer; }
       button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
       input[type=range] { flex: 1; accent-color: var(--accent); }
+      #motion[aria-pressed=true] { border-color: var(--accent); }
       .tc { color: var(--muted); min-width: 150px; text-align: right; font-variant-numeric: tabular-nums; }
       body.render { display: block; background: #000; }
       body.render .stage { padding: 0; display: block; }
@@ -38,9 +39,15 @@
     <div class="bar">
       <button id="play" type="button" aria-label="Play or pause (space)">Play</button>
       <input id="scrub" type="range" min="0" max="1799" value="0" step="1" aria-label="Frame" />
+      <button id="motion" type="button" hidden aria-pressed="false">Full motion</button>
       <span class="tc" id="tc">00.000 s · F0000</span>
     </div>
-    <audio id="audio" src="out/score.wav" preload="auto"></audio>
+    <!-- fresh checkout: score.wav is a build output, so fall back to the committed Opus copy (then the MP4's AAC track) -->
+    <audio id="audio" preload="auto">
+      <source src="out/score.wav" type="audio/wav" />
+      <source src="out/score.webm" type="audio/webm; codecs=opus" />
+      <source src="out/claude-motion-resume.mp4" type="video/mp4" />
+    </audio>
     <script type="module" src="src/main.js"></script>
   </body>
 </html>

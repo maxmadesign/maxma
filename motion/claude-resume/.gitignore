@@ -3,3 +3,4 @@ frames/
 out/*
 !out/claude-motion-resume.mp4
 !out/poster.png
+!out/score.webm

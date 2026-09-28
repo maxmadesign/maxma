@@ -1,10 +1,10 @@
 // Headless renderer: node render.mjs [--stills 1.2,3.4] [--frames] [--encode] [--cues] [--workers 4]
-import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { serve } from './serve.mjs';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -17,20 +17,6 @@ const WORKERS = parseInt(opt('workers', '4'), 10);
 const FRAMES_DIR = path.join(ROOT, 'frames');
 const OUT = path.join(ROOT, 'out');
 const FFMPEG = process.env.FFMPEG || 'ffmpeg';
-
-const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.woff2': 'font/woff2', '.wav': 'audio/wav', '.json': 'application/json' };
-function serve() {
-  const server = http.createServer((req, res) => {
-    const p = path.join(ROOT, decodeURIComponent(new URL(req.url, 'http://x').pathname));
-    if (!p.startsWith(ROOT) || !fs.existsSync(p) || fs.statSync(p).isDirectory()) {
-      res.writeHead(404);
-      return res.end();
-    }
-    res.writeHead(200, { 'content-type': MIME[path.extname(p)] || 'application/octet-stream' });
-    fs.createReadStream(p).pipe(res);
-  });
-  return new Promise((r) => server.listen(0, '127.0.0.1', () => r(server)));
-}
 
 async function openPage(browser, port) {
   const context = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
@@ -123,5 +109,10 @@ if (flag('encode')) {
   ];
   const r = spawnSync(FFMPEG, cmd, { stdio: 'inherit' });
   if (r.status !== 0) process.exit(r.status ?? 1);
+  if (hasAudio) {
+    // committed, browser-universal copy of the soundtrack for the preview on a fresh checkout
+    const o = spawnSync(FFMPEG, ['-y', '-loglevel', 'error', '-i', wav, '-c:a', 'libopus', '-b:a', '160k', path.join(OUT, 'score.webm')], { stdio: 'inherit' });
+    if (o.status !== 0) process.exit(o.status ?? 1);
+  }
   console.log(`encoded → ${mp4}`);
 }

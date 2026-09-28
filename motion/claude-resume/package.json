@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "preview": "npx http-server -p 5173 -c-1 .",
+    "preview": "node serve.mjs",
     "render": "node render.mjs"
   },
   "devDependencies": {

@@ -70,16 +70,43 @@ function preview(start) {
     show(time % DURATION);
     raf = requestAnimationFrame(loop);
   };
+  // prefers-reduced-motion: play the key frames as held stills (no continuous motion, no sound)
+  // unless the viewer explicitly opts in to full motion.
+  const STILLS = [1.9, 5.3, 8.3, 11.6, 13.5, 16.1, 18.9, 20.9, 23.3, 25.8, 28.0];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const motionBtn = document.getElementById('motion');
+  let fullMotion = false, timer = 0;
+  const reduced = () => reduce.matches && !fullMotion;
+  const syncMotionUI = () => {
+    motionBtn.hidden = !reduce.matches;
+    motionBtn.setAttribute('aria-pressed', String(fullMotion));
+  };
+  reduce.addEventListener('change', () => { if (playing) toggle(); syncMotionUI(); });
+  motionBtn.addEventListener('click', () => {
+    if (playing) toggle();
+    fullMotion = !fullMotion;
+    syncMotionUI();
+  });
+  syncMotionUI();
+
+  const stepStill = () => {
+    const next = STILLS.find((s) => s > t + 0.01) ?? STILLS[0];
+    show(next);
+  };
   const toggle = () => {
     playing = !playing;
     play.textContent = playing ? 'Pause' : 'Play';
-    if (playing) {
+    if (playing && reduced()) {
+      stepStill();
+      timer = setInterval(stepStill, 2500);
+    } else if (playing) {
       t0 = performance.now() - t * 1000;
       audio.currentTime = t;
       audio.loop = true;
       audio.play().catch(() => {});
       raf = requestAnimationFrame(loop);
     } else {
+      clearInterval(timer);
       cancelAnimationFrame(raf);
       audio.pause();
     }
