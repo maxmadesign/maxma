@@ -1,0 +1,760 @@
+<title>今日时间块</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap">
+<style>
+:root{
+  --bg:#EAEEF2; --surface:#FFFFFF; --surface-2:#F4F6F9; --ink:#16202B; --muted:#586575; --faint:#8A95A3;
+  --line:#D6DDE5; --line-soft:#E6EBF0; --accent:#1C6477; --accent-ink:#FFFFFF; --accent-soft:#DDEEF2;
+  --now:#D2462A; --warn:#B4541A; --ok:#23875B;
+  --c-work:#2F63D0; --c-study:#7450C2; --c-sport:#23875B; --c-life:#B37608; --c-rest:#5F7390;
+  --shadow:0 1px 2px rgba(22,32,43,.05),0 6px 20px rgba(22,32,43,.06);
+  --serif:"Noto Serif SC","Songti SC","STSong",serif;
+  --sans:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0E1216; --surface:#161C22; --surface-2:#1C232B; --ink:#E3E9EF; --muted:#9AA6B3; --faint:#6D7885;
+    --line:#2A333D; --line-soft:#222A33; --accent:#5DB4C8; --accent-ink:#0E1216; --accent-soft:#1A3139;
+    --now:#FF6E4E; --warn:#F0955A; --ok:#5CC792;
+    --c-work:#7FA3F2; --c-study:#AF93EC; --c-sport:#5CC792; --c-life:#E2B14E; --c-rest:#9BAAC0;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1216; --surface:#161C22; --surface-2:#1C232B; --ink:#E3E9EF; --muted:#9AA6B3; --faint:#6D7885;
+  --line:#2A333D; --line-soft:#222A33; --accent:#5DB4C8; --accent-ink:#0E1216; --accent-soft:#1A3139;
+  --now:#FF6E4E; --warn:#F0955A; --ok:#5CC792;
+  --c-work:#7FA3F2; --c-study:#AF93EC; --c-sport:#5CC792; --c-life:#E2B14E; --c-rest:#9BAAC0;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num,.t{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+.app{max-width:1200px;margin:0 auto;padding-inline:20px;padding-block:28px 56px;display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:20px;align-items:start}
+.top{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px 24px;align-items:end}
+.side{display:grid;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line-soft);border-radius:14px;box-shadow:var(--shadow);padding:18px}
+.card h2{font-size:13px;font-weight:700;letter-spacing:.04em;margin:0;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card h2 small{font-weight:400;color:var(--faint);letter-spacing:0;font-size:12px}
+.card .sub{color:var(--muted);font-size:12.5px;margin:4px 0 0}
+
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+.date-h{font-family:var(--serif);font-size:clamp(28px,4.2vw,42px);font-weight:700;margin:2px 0 0;line-height:1.15;text-wrap:balance}
+.date-h span{color:var(--muted);font-weight:600;font-size:.6em;margin-left:.4em}
+.nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:7px 12px;font-size:13px;font-weight:500;line-height:1.2;transition:background .15s,border-color .15s}
+.btn:hover{background:var(--surface-2);border-color:var(--faint)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.08);background:var(--accent)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.ghost:hover{background:var(--surface-2);color:var(--ink)}
+.btn.danger{color:var(--now);border-color:color-mix(in srgb,var(--now) 40%,transparent)}
+.btn.danger.armed{background:var(--now);color:#fff;border-color:var(--now)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.icon-btn{width:34px;height:34px;padding:0;display:inline-grid;place-items:center;font-size:16px}
+
+.week{grid-column:1/-1;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.wd{border:1px solid var(--line-soft);background:var(--surface);border-radius:11px;padding:8px 6px;text-align:center;display:grid;gap:1px}
+.wd:hover{border-color:var(--line)}
+.wd .w{font-size:12px;color:var(--muted)}
+.wd .d{font-family:var(--mono);font-size:17px;font-weight:600}
+.wd .c{font-size:11px;color:var(--faint);min-height:16px}
+.wd.today .w::after{content:" · 今天";color:var(--accent);font-weight:500}
+.wd.sel{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.wd.sel .w,.wd.sel .c{color:color-mix(in srgb,var(--bg) 72%,transparent)}
+.wd.sel.today .w::after{color:inherit}
+
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px;margin-top:14px}
+.stat .k{font-size:12px;color:var(--muted)}
+.stat .v{font-family:var(--mono);font-size:22px;font-weight:600;line-height:1.2}
+.stat .v small{font-size:12px;color:var(--muted);font-weight:500;margin-left:2px}
+.bar{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--ok);border-radius:inherit;transition:width .3s}
+.dayline{margin-top:16px}
+.dayline .track{position:relative;height:14px;border-radius:5px;background:var(--surface-2);overflow:hidden;border:1px solid var(--line-soft)}
+.dayline .seg{position:absolute;top:0;bottom:0;background:var(--cat)}
+.dayline .nowtick{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--now)}
+.dayline .ticks{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:3px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:10px;font-size:12px;color:var(--muted)}
+
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;padding:1px 7px 1px 6px;border-radius:99px;white-space:nowrap;line-height:1.6;background:color-mix(in srgb,var(--cat,var(--muted)) 14%,transparent);color:var(--cat,var(--muted))}
+.tag::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.tag.plain{background:transparent;padding:0}
+.tag.warn{--cat:var(--warn)}
+.tag.now{--cat:var(--now)}
+.tag.ok{--cat:var(--ok)}
+[data-cat="work"]{--cat:var(--c-work)} [data-cat="study"]{--cat:var(--c-study)} [data-cat="sport"]{--cat:var(--c-sport)} [data-cat="life"]{--cat:var(--c-life)} [data-cat="rest"]{--cat:var(--c-rest)}
+
+.top3{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.top3 li{display:grid;grid-template-columns:22px 20px minmax(0,1fr);align-items:center;gap:6px}
+.top3 .n{font-family:var(--serif);font-weight:700;color:var(--faint);font-size:15px;text-align:center}
+.top3 input[type=text]{border:0;border-bottom:1px dashed var(--line);background:transparent;padding:5px 2px;width:100%;border-radius:0}
+.top3 input[type=text]:focus{outline:none;border-bottom:1px solid var(--accent)}
+.top3 li.done input[type=text]{text-decoration:line-through;color:var(--faint)}
+input[type=checkbox]{accent-color:var(--ok);width:16px;height:16px;margin:0}
+textarea.note{width:100%;min-height:74px;resize:vertical;margin-top:10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);padding:9px 10px;line-height:1.6}
+
+.field{border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:7px 9px;min-width:0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.inbox-add{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:12px}
+.inbox-add .row{grid-column:1/-1}
+.inbox-list{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:2px}
+.inbox-list li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;padding:7px 4px 7px 8px;border-radius:8px}
+.inbox-list li:hover{background:var(--surface-2)}
+.inbox-list .ttl{overflow-wrap:anywhere}
+.inbox-list .dur{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.inbox-list .x{border:0;background:transparent;color:var(--faint);width:26px;height:26px;border-radius:6px}
+.inbox-list .x:hover{color:var(--now);background:var(--surface)}
+.empty{color:var(--faint);font-size:12.5px;padding:10px 4px}
+.sleep-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px;font-size:12.5px;color:var(--muted)}
+.sleep-row input{width:94px}
+.sample-note{font-size:11.5px;color:var(--warn);margin-top:6px}
+
+.ai textarea{width:100%;min-height:84px;resize:vertical;margin-top:10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);padding:9px 10px;line-height:1.6}
+.ai-out{margin-top:12px;display:grid;gap:6px}
+.ai-out .it{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;font-size:13px}
+.ai-out .tip{font-size:12.5px;color:var(--muted);background:var(--surface-2);border-radius:8px;padding:8px 10px}
+.ai .status{font-size:12.5px;color:var(--muted);margin-top:8px}
+
+.main{padding:0;overflow:hidden}
+.tl-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--line-soft)}
+.tl-head h2{font-size:15px}
+.banner{margin:12px 16px 0;padding:10px 12px;border-radius:10px;background:var(--accent-soft);display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:13px}
+.tl-scroll{max-height:calc(100vh - 150px);min-height:520px;overflow-y:auto;overscroll-behavior:contain;padding:14px 16px 18px 0}
+.tl{position:relative;margin-left:58px;cursor:copy}
+.hr{position:absolute;left:0;right:0;border-top:1px solid var(--line-soft)}
+.hr.half{border-top-style:dashed;opacity:.6}
+.hr .lab{position:absolute;left:-54px;top:-9px;width:44px;text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--faint)}
+.off{position:absolute;left:0;right:0;background:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--faint) 10%,transparent) 6px 7px);pointer-events:none}
+.off span{position:absolute;right:8px;top:4px;font-size:11px;color:var(--faint)}
+.blk{position:absolute;border-radius:9px;padding:5px 8px 5px 10px;overflow:hidden;cursor:pointer;display:flex;gap:8px;align-items:flex-start;
+  background:color-mix(in srgb,var(--cat) 13%,var(--surface));border:1px solid color-mix(in srgb,var(--cat) 38%,transparent);transition:box-shadow .15s,transform .15s}
+.blk:hover{box-shadow:var(--shadow);z-index:3}
+.blk .body{min-width:0;flex:1}
+.blk .title{font-weight:500;font-size:13px;line-height:1.35;overflow-wrap:anywhere}
+.blk .meta{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:center;font-size:11.5px;color:var(--muted);margin-top:1px}
+.blk .meta .t{font-size:11.5px}
+.blk.short{align-items:center;padding-block:1px}
+.blk.short .body{display:flex;gap:8px;align-items:baseline;white-space:nowrap}
+.blk.short .title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.blk.short .meta{margin:0;flex-wrap:nowrap}
+.blk.done{opacity:.6}
+.blk.done .title{text-decoration:line-through}
+.blk.live{box-shadow:0 0 0 2px color-mix(in srgb,var(--now) 55%,transparent)}
+.blk input{margin-top:2px;flex:none}
+.blk.short input{margin-top:0}
+.nowline{position:absolute;left:-6px;right:0;height:0;border-top:2px solid var(--now);z-index:4;pointer-events:none}
+.nowline::before{content:"";position:absolute;left:0;top:-6px;width:10px;height:10px;border-radius:50%;background:var(--now)}
+.nowline span{position:absolute;right:4px;top:-20px;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--now);background:var(--surface);padding:0 4px;border-radius:4px}
+.tl-foot{padding:10px 16px 14px;border-top:1px solid var(--line-soft);font-size:12px;color:var(--faint)}
+
+.modal-wrap{position:fixed;inset:0;background:rgba(10,16,22,.42);display:grid;place-items:center;padding:16px;z-index:50}
+.modal{background:var(--surface);border-radius:16px;width:min(440px,100%);padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.25);display:grid;gap:14px;max-height:calc(100% - 20px);overflow:auto}
+.modal h3{margin:0;font-family:var(--serif);font-size:20px}
+.modal label{display:grid;gap:5px;font-size:12.5px;color:var(--muted)}
+.modal .field{color:var(--ink);font-size:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:4px 11px 4px 9px;font-size:13px;display:inline-flex;align-items:center;gap:6px;color:var(--ink)}
+.chip::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--cat)}
+.chip[aria-pressed="true"]{border-color:var(--cat);background:color-mix(in srgb,var(--cat) 14%,var(--surface));font-weight:500}
+.err{color:var(--now);font-size:12.5px;min-height:1em}
+.modal .actions{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.modal .dur-hint{font-size:12px;color:var(--faint)}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:10px;font-size:13px;z-index:60;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
+
+@media (max-width:880px){
+  .app{grid-template-columns:minmax(0,1fr);padding-inline:16px}
+  .top{grid-template-columns:minmax(0,1fr)}
+  .main{order:-1}
+  .side{order:0}
+  .tl-scroll{max-height:none;min-height:0}
+  .wd .c{display:none}
+  .wd{padding:6px 2px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app" id="app">
+  <header class="top">
+    <div>
+      <div class="eyebrow" id="eyebrow"></div>
+      <h1 class="date-h" id="dateH"></h1>
+    </div>
+    <div class="nav">
+      <button class="btn icon-btn" id="prev" aria-label="前一天">‹</button>
+      <button class="btn" id="todayBtn">回到今天</button>
+      <button class="btn icon-btn" id="next" aria-label="后一天">›</button>
+      <button class="btn primary" id="addBtn">＋ 新建时间块</button>
+    </div>
+    <nav class="week" id="week" aria-label="本周"></nav>
+  </header>
+
+  <section class="card main" aria-label="时间轴">
+    <div class="tl-head">
+      <h2>时间轴 <small id="tlHint">点击空白处即可在该时刻添加</small></h2>
+      <div class="row" id="fill"></div>
+    </div>
+    <div id="banner"></div>
+    <div class="tl-scroll" id="tlScroll"><div class="tl" id="tl"></div></div>
+    <div class="tl-foot" id="tlFoot"></div>
+  </section>
+
+  <aside class="side">
+    <section class="card" aria-label="今日概览">
+      <h2>今日概览 <small id="saveState"></small></h2>
+      <div class="stats" id="stats"></div>
+      <div class="dayline" id="dayline"></div>
+    </section>
+
+    <section class="card" aria-label="三件要事">
+      <h2>三件要事 <small>今天最重要的事</small></h2>
+      <ul class="top3" id="top3"></ul>
+      <textarea class="note" id="note" placeholder="今日备忘：想法、提醒、复盘……"></textarea>
+    </section>
+
+    <section class="card" aria-label="待排任务">
+      <h2>待排任务 <small id="inboxCount"></small></h2>
+      <p class="sub">先把要做的事写下来，再一键排进空闲时段。</p>
+      <form class="inbox-add" id="inboxForm" autocomplete="off">
+        <input class="field" id="inTitle" placeholder="例如：整理报销单" maxlength="60">
+        <button class="btn" type="submit">添加</button>
+        <div class="row">
+          <select class="field" id="inMins" aria-label="预计时长">
+            <option value="15">15 分钟</option><option value="30" selected>30 分钟</option><option value="45">45 分钟</option>
+            <option value="60">1 小时</option><option value="90">1.5 小时</option><option value="120">2 小时</option><option value="180">3 小时</option>
+          </select>
+          <select class="field" id="inCat" aria-label="分类"></select>
+        </div>
+      </form>
+      <ul class="inbox-list" id="inbox"></ul>
+      <button class="btn primary" id="autoBtn" style="width:100%;margin-top:10px">自动排入空闲时段</button>
+      <div class="sleep-row">
+        <span>作息</span>
+        <label>起床 <input class="field" type="time" id="wake" step="900"></label>
+        <label>就寝 <input class="field" type="time" id="sleep" step="900"></label>
+      </div>
+    </section>
+
+    <section class="card ai" id="aiCard" hidden aria-label="AI 排程助手">
+      <h2>让 Claude 帮你排 <small>用一句话描述今天</small></h2>
+      <textarea id="aiText" placeholder="例如：上午要写季度报告，下午三点和客户开会一小时，晚上想跑步半小时，睡前读点书。"></textarea>
+      <div class="row" style="margin-top:8px"><button class="btn primary" id="aiBtn">生成建议日程</button></div>
+      <div class="status" id="aiStatus" aria-live="polite"></div>
+      <div class="ai-out" id="aiOut"></div>
+    </section>
+  </aside>
+</div>
+<div id="modalRoot"></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(() => {
+const CATS = { work:'工作', study:'学习', sport:'运动', life:'生活', rest:'休息' };
+const WEEK = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+const WEEK_S = ['周日','周一','周二','周三','周四','周五','周六'];
+const LS_KEY = 'daily-planner-v1';
+const HOUR_PX = 60;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2,'0');
+const toMin = t => { const [h,m] = String(t).split(':').map(Number); return h*60 + (m||0); };
+const fmt = m => `${pad(Math.floor(m/60))}:${pad(m%60)}`;
+const dur = m => m < 60 ? `${m} 分钟` : (m % 60 ? `${Math.floor(m/60)} 小时 ${m%60} 分` : `${m/60} 小时`);
+const hrs = m => (Math.round(m/6)/10).toString();
+const uid = () => Math.random().toString(36).slice(2, 10);
+const clone = o => JSON.parse(JSON.stringify(o));
+const keyOf = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const dateOf = k => { const [y,m,d] = k.split('-').map(Number); return new Date(y, m-1, d); };
+const todayKey = () => keyOf(new Date());
+const addDays = (k, n) => { const d = dateOf(k); d.setDate(d.getDate()+n); return keyOf(d); };
+const nowMin = () => { const d = new Date(); return d.getHours()*60 + d.getMinutes(); };
+const isoWeek = d => { const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); const day = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - day); const y0 = new Date(Date.UTC(t.getUTCFullYear(),0,1)); return Math.ceil(((t - y0)/864e5 + 1)/7); };
+
+/* ---------- examples shown before first use ---------- */
+const SAMPLE_DAY = () => ({
+  sample: true,
+  items: [
+    ['07:30','08:00','起床 · 洗漱早餐','life'],
+    ['08:30','10:30','深度工作：季度复盘报告','work'],
+    ['10:30','10:45','起身走动 · 喝水','rest'],
+    ['10:45','12:00','回复邮件与消息','work'],
+    ['12:00','13:15','午餐 + 午休','rest'],
+    ['13:30','14:30','项目周会','work'],
+    ['14:30','16:30','专注：新功能方案','work'],
+    ['17:00','17:30','整理明日待办','life'],
+    ['18:30','19:15','跑步 5 公里','sport'],
+    ['20:00','21:00','阅读 · 英语听力','study'],
+    ['22:30','23:00','放松 · 准备睡觉','rest'],
+  ].map(([s,e,t,c]) => ({ id: uid(), start:s, end:e, title:t, cat:c, done:false, note:'' })),
+  top3: [{text:'完成季度复盘报告初稿',done:false},{text:'跑步 5 公里',done:false},{text:'给家里打个电话',done:false}],
+  note: ''
+});
+const SAMPLE_INBOX = [
+  { id: uid(), title:'整理书桌和桌面文件', mins:15, cat:'life' },
+  { id: uid(), title:'学习两个新的表格函数', mins:45, cat:'study' },
+  { id: uid(), title:'预约牙医复诊', mins:15, cat:'life' },
+];
+const TEMPLATES = {
+  work: [['07:00','07:45','起床 · 早餐','life'],['08:30','11:30','深度工作','work'],['11:30','12:00','处理消息','work'],['12:00','13:30','午餐 + 午休','rest'],['13:30','15:30','会议与协作','work'],['15:30','17:30','事务处理','work'],['17:30','18:00','复盘 · 列明日计划','life'],['18:30','19:30','运动','sport'],['20:00','21:30','学习 / 阅读','study'],['22:30','23:00','放松 · 准备睡觉','rest']],
+  rest: [['08:30','09:30','慢慢起床 · 早午餐','life'],['10:00','11:30','户外活动','sport'],['12:00','13:30','午餐 + 小憩','rest'],['14:00','16:00','兴趣 / 学习','study'],['16:00','17:30','家务与采购','life'],['18:00','19:30','和家人朋友吃饭','life'],['20:00','21:30','电影 · 自由时间','rest'],['21:30','22:00','规划下周','life']],
+};
+
+/* ---------- state ---------- */
+const state = {
+  date: todayKey(),
+  days: {},
+  inbox: { tasks: [] },
+  settings: { wake:'07:00', sleep:'23:00', onboarded:false },
+  mode: 'local',
+  armed: null,
+};
+let sample = null, db = null, firstScroll = true;
+const sampleDay = SAMPLE_DAY();
+
+/* ---------- storage: artifact db when available, browser storage otherwise ---------- */
+function readLocal(){
+  try { const raw = localStorage.getItem(LS_KEY); if (!raw) return; const d = JSON.parse(raw);
+    if (d.days) state.days = d.days; if (d.inbox) state.inbox = d.inbox; if (d.settings) state.settings = { ...state.settings, ...d.settings };
+  } catch {}
+}
+function writeLocal(){
+  try { localStorage.setItem(LS_KEY, JSON.stringify({ days: state.days, inbox: state.inbox, settings: state.settings })); } catch {}
+}
+const pend = {}, busy = {};
+function save(path, data){
+  if (state.mode !== 'db') { writeLocal(); flashSaved(); return; }
+  pend[path] = clone(data);
+  if (!busy[path]) flush(path);
+}
+async function flush(path){
+  busy[path] = true; setSaveState('保存中…');
+  while (pend[path]) {
+    const data = pend[path]; delete pend[path];
+    try { await db.doc(path).set(data); }
+    catch (e) {
+      if (e && e.code === 'unavailable') {
+        await new Promise(r => setTimeout(r, 700 + Math.random()*800));
+        try { await db.doc(path).set(data); } catch (e2) { toast(errText(e2)); }
+      } else toast(errText(e));
+    }
+  }
+  busy[path] = false;
+  if (!Object.values(busy).some(Boolean)) flashSaved();
+}
+function errText(e){
+  const c = e && e.code;
+  if (c === 'quota_exceeded') return '存储空间已满，请删除一些旧日程后再试。';
+  if (c === 'invalid_argument') return '你没有修改这份日程的权限，改动未保存。';
+  if (c === 'resource_exhausted') return '操作太频繁，请稍等几秒再试。';
+  return '暂时无法保存，请检查网络后重试。';
+}
+let saveTimer;
+function setSaveState(t){ $('saveState').textContent = t; }
+function flashSaved(){ setSaveState(state.mode === 'db' ? '已同步' : '已保存在本机'); clearTimeout(saveTimer); saveTimer = setTimeout(() => setSaveState(''), 2200); }
+
+async function connect(){
+  if (!window.claude || typeof window.claude.use !== 'function') return;
+  try { db = await window.claude.use('db'); } catch { db = null; }
+  if (db) {
+    state.mode = 'db';
+    db.collection('days').onSnapshot(snap => {
+      snap.docChanges().forEach(ch => {
+        const p = 'days/' + ch.doc.id;
+        if (busy[p] || pend[p]) return;
+        if (ch.type === 'removed') delete state.days[ch.doc.id]; else state.days[ch.doc.id] = clone(ch.doc.data());
+      });
+      render();
+    }, () => { toast('同步已中断，刷新页面即可恢复。'); });
+    db.collection('meta').onSnapshot(snap => {
+      snap.docs.forEach(d => {
+        const p = 'meta/' + d.id; if (busy[p] || pend[p]) return;
+        if (d.id === 'inbox') state.inbox = clone(d.data());
+        if (d.id === 'settings') state.settings = { ...state.settings, ...clone(d.data()) };
+      });
+      render();
+    }, () => {});
+  }
+  try { sample = await window.claude.use('sample'); } catch { sample = null; }
+  $('aiCard').hidden = !sample;
+}
+
+/* ---------- day helpers ---------- */
+function emptyDay(){ return { items: [], top3: [{text:'',done:false},{text:'',done:false},{text:'',done:false}], note:'' }; }
+function viewDay(k = state.date){
+  const d = state.days[k];
+  if (d) return d;
+  if (k === todayKey() && !state.settings.onboarded) return sampleDay;
+  return emptyDay();
+}
+function viewInbox(){ return (!state.settings.onboarded && !(state.inbox.tasks||[]).length) ? SAMPLE_INBOX : (state.inbox.tasks || []); }
+function onboard(){
+  if (state.settings.onboarded) return;
+  state.settings.onboarded = true;
+  if (!(state.inbox.tasks||[]).length) { state.inbox = { tasks: clone(SAMPLE_INBOX) }; save('meta/inbox', state.inbox); }
+  save('meta/settings', state.settings);
+}
+function mutateDay(fn, k = state.date){
+  const d = clone(viewDay(k)); delete d.sample;
+  d.items = d.items || []; d.top3 = d.top3 || emptyDay().top3;
+  fn(d);
+  d.items.sort((a,b) => toMin(a.start) - toMin(b.start));
+  state.days[k] = d;
+  onboard();
+  save('days/' + k, d);
+  render();
+}
+function mutateInbox(fn){
+  const tasks = clone(viewInbox());
+  onboard();
+  state.inbox = { tasks: fn(tasks) || tasks };
+  save('meta/inbox', state.inbox);
+  render();
+}
+function freeSlots(items, from, to){
+  const busyR = items.map(i => [toMin(i.start), toMin(i.end)]).sort((a,b) => a[0]-b[0]);
+  const out = []; let cur = from;
+  for (const [s,e] of busyR) { if (e <= cur) continue; if (s > cur) out.push([cur, Math.min(s, to)]); cur = Math.max(cur, e); if (cur >= to) break; }
+  if (cur < to) out.push([cur, to]);
+  return out.filter(([s,e]) => e > s);
+}
+function unionMinutes(items){
+  const r = items.map(i => [toMin(i.start), toMin(i.end)]).sort((a,b)=>a[0]-b[0]);
+  let total = 0, cs = -1, ce = -1;
+  for (const [s,e] of r) { if (s > ce) { if (ce > cs) total += ce - cs; cs = s; ce = e; } else ce = Math.max(ce, e); }
+  if (ce > cs) total += ce - cs;
+  return total;
+}
+function layout(items){
+  const sorted = items.map(i => ({ ...i, s: toMin(i.start), e: toMin(i.end) })).sort((a,b) => a.s - b.s || a.e - b.e);
+  const res = []; let cluster = [], cEnd = -1;
+  const close = () => { const cols = []; cluster.forEach(it => { let c = cols.findIndex(end => end <= it.s); if (c < 0) { c = cols.length; cols.push(0); } cols[c] = it.e; it.col = c; }); cluster.forEach(it => it.ncol = cols.length); res.push(...cluster); cluster = []; };
+  for (const it of sorted) { if (cluster.length && it.s >= cEnd) { close(); cEnd = -1; } cluster.push(it); cEnd = Math.max(cEnd, it.e); }
+  if (cluster.length) close();
+  return res;
+}
+
+/* ---------- render ---------- */
+function render(){
+  renderHeader(); renderTimeline(); renderStats(); renderTop3(); renderInbox(); renderSettings();
+}
+function renderHeader(){
+  const d = dateOf(state.date), tk = todayKey();
+  const rel = state.date === tk ? '今天' : state.date === addDays(tk,1) ? '明天' : state.date === addDays(tk,-1) ? '昨天' : '';
+  $('eyebrow').textContent = `${d.getFullYear()} · 第 ${isoWeek(d)} 周${rel ? ' · ' + rel : ''}`;
+  $('dateH').innerHTML = `${d.getMonth()+1} 月 ${d.getDate()} 日<span>${WEEK[d.getDay()]}</span>`;
+  const mon = addDays(state.date, -((d.getDay()+6)%7));
+  let h = '';
+  for (let i = 0; i < 7; i++) {
+    const k = addDays(mon, i), dd = dateOf(k), n = ((state.days[k]||{}).items||[]).length;
+    h += `<button class="wd${k===state.date?' sel':''}${k===tk?' today':''}" data-day="${k}" aria-pressed="${k===state.date}"><span class="w">${WEEK_S[dd.getDay()]}</span><span class="d">${dd.getDate()}</span><span class="c">${n ? n + ' 项安排' : '未安排'}</span></button>`;
+  }
+  $('week').innerHTML = h;
+}
+function renderTimeline(){
+  const day = viewDay(), items = day.items || [], tk = todayKey();
+  const wake = toMin(state.settings.wake), sleep = toMin(state.settings.sleep);
+  const earliest = Math.min(wake, ...items.map(i => toMin(i.start)));
+  const startH = Math.max(0, Math.min(6, Math.floor(earliest/60)));
+  const endH = 24, base = startH*60;
+  const y = m => (m - base) / 60 * HOUR_PX;
+  const tl = $('tl');
+  tl.style.height = (endH - startH) * HOUR_PX + 'px';
+  tl.dataset.base = base;
+  let h = '';
+  if (wake > base) h += `<div class="off" style="top:0;height:${y(wake)}px"><span>睡眠</span></div>`;
+  if (sleep < endH*60) h += `<div class="off" style="top:${y(sleep)}px;height:${y(endH*60)-y(sleep)}px"><span>睡眠</span></div>`;
+  for (let H = startH; H <= endH; H++) {
+    h += `<div class="hr" style="top:${y(H*60)}px"><span class="lab">${pad(H)}:00</span></div>`;
+    if (H < endH) h += `<div class="hr half" style="top:${y(H*60+30)}px"></div>`;
+  }
+  const isToday = state.date === tk, nm = nowMin();
+  layout(items).forEach(it => {
+    const top = y(it.s), hgt = Math.max(22, y(it.e) - top - 2), w = 100 / it.ncol;
+    const short = hgt < 44;
+    const live = isToday && nm >= it.s && nm < it.e;
+    const tags = [];
+    if (it.ncol > 1) tags.push('<span class="tag warn">时间冲突</span>');
+    if (live && !it.done) tags.push('<span class="tag now">进行中</span>');
+    if (it.done) tags.push('<span class="tag ok">已完成</span>');
+    h += `<div class="blk${short?' short':''}${it.done?' done':''}${live?' live':''}" data-cat="${esc(it.cat)}" data-id="${esc(it.id)}"
+      style="top:${top}px;height:${hgt}px;left:calc(${it.col*w}% + 2px);width:calc(${w}% - 6px)" tabindex="0" role="button" aria-label="${esc(it.title)} ${it.start}–${it.end}">
+      <input type="checkbox" data-toggle="${esc(it.id)}" ${it.done?'checked':''} aria-label="标记完成：${esc(it.title)}">
+      <div class="body"><div class="title">${esc(it.title)}</div>
+      <div class="meta"><span class="t">${it.start}–${it.end}</span><span class="tag plain">${CATS[it.cat]||'其他'}</span>${short ? '' : `<span>${dur(it.e-it.s)}</span>`}${tags.join('')}</div></div></div>`;
+  });
+  if (isToday && nm >= base) h += `<div class="nowline" style="top:${y(nm)}px"><span>现在 ${fmt(nm)}</span></div>`;
+  tl.innerHTML = h;
+
+  $('banner').innerHTML = day.sample ? `<div class="banner"><span><b>这是一份示例日程</b>，让你先看看效果。点任意时间块即可修改。</span><span class="row"><button class="btn" data-act="keep">保留并修改</button><button class="btn primary" data-act="clear-sample">从空白开始</button></span></div>` : '';
+
+  const n = items.length;
+  const armedTxt = a => state.armed === a ? `确认替换 ${n} 项？` : null;
+  $('fill').innerHTML = `<button class="btn ghost" data-tpl="work">${armedTxt('work') || '工作日模板'}</button><button class="btn ghost" data-tpl="rest">${armedTxt('rest') || '周末模板'}</button><button class="btn ghost" data-tpl="copy">${armedTxt('copy') || '复制前一天'}</button>${n ? `<button class="btn ghost${state.armed==='clear'?' danger armed':''}" data-tpl="clear">${state.armed==='clear' ? '确认清空？' : '清空'}</button>` : ''}`;
+
+  const conflicts = layout(items).filter(i => i.ncol > 1).length;
+  $('tlFoot').textContent = n ? `共 ${n} 个时间块${conflicts ? `，其中 ${conflicts} 个时间重叠，建议调整` : ''}。灰色斜线区域是你设定的睡眠时间。` : '这一天还没有安排。可以套用模板、点击时间轴添加，或把待排任务自动排进来。';
+
+  if (firstScroll) {
+    firstScroll = false;
+    const target = isToday ? nm - 90 : wake - 30;
+    requestAnimationFrame(() => { $('tlScroll').scrollTop = Math.max(0, y(target)); });
+  }
+}
+function renderStats(){
+  const day = viewDay(), items = day.items || [];
+  const wake = toMin(state.settings.wake), sleep = toMin(state.settings.sleep);
+  const planned = unionMinutes(items);
+  const inWake = items.filter(i => toMin(i.end) > wake && toMin(i.start) < sleep).map(i => ({ start: fmt(Math.max(wake, toMin(i.start))), end: fmt(Math.min(sleep, toMin(i.end))) }));
+  const free = Math.max(0, (sleep - wake) - unionMinutes(inWake));
+  const done = items.filter(i => i.done).length;
+  const focus = items.filter(i => i.cat === 'work' || i.cat === 'study').reduce((s,i) => s + toMin(i.end) - toMin(i.start), 0);
+  const pct = items.length ? Math.round(done / items.length * 100) : 0;
+  $('stats').innerHTML = `
+    <div class="stat"><div class="k">已安排</div><div class="v">${hrs(planned)}<small>小时</small></div></div>
+    <div class="stat"><div class="k">清醒时段内空闲</div><div class="v">${hrs(free)}<small>小时</small></div></div>
+    <div class="stat"><div class="k">专注时长（工作 + 学习）</div><div class="v">${hrs(focus)}<small>小时 ≈ ${Math.floor(focus/25)} 个番茄钟</small></div></div>
+    <div class="stat"><div class="k">完成进度</div><div class="v">${done}<small>/ ${items.length} 项 · ${pct}%</small></div><div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div></div>`;
+  const span = Math.max(60, sleep - wake), pos = m => ((m - wake) / span * 100).toFixed(2);
+  let segs = '';
+  items.forEach(i => { const s = Math.max(wake, toMin(i.start)), e = Math.min(sleep, toMin(i.end)); if (e > s) segs += `<i class="seg" data-cat="${esc(i.cat)}" style="left:${pos(s)}%;width:${((e-s)/span*100).toFixed(2)}%"></i>`; });
+  const nm = nowMin();
+  if (state.date === todayKey() && nm > wake && nm < sleep) segs += `<i class="nowtick" style="left:${pos(nm)}%" title="现在"></i>`;
+  const used = [...new Set(items.map(i => i.cat))].filter(c => CATS[c]);
+  const mid = Math.round((wake + sleep) / 2 / 30) * 30;
+  $('dayline').innerHTML = `<div class="track" aria-label="从起床到就寝的时间分布">${segs}</div><div class="ticks"><span>${state.settings.wake} 起床</span><span>${fmt(mid)}</span><span>${state.settings.sleep} 就寝</span></div>
+    <div class="legend">${used.map(c => `<span class="tag plain" data-cat="${c}">${CATS[c]} ${hrs(items.filter(i=>i.cat===c).reduce((s,i)=>s+toMin(i.end)-toMin(i.start),0))}h</span>`).join('') || '<span>添加安排后，这里会显示一天的时间分布</span>'}</div>`;
+}
+function renderTop3(){
+  const box = $('top3');
+  if (box.contains(document.activeElement) || document.activeElement === $('note')) return;
+  const day = viewDay(), t3 = day.top3 || emptyDay().top3;
+  box.innerHTML = [0,1,2].map(i => { const t = t3[i] || {text:'',done:false}; return `<li class="${t.done?'done':''}"><span class="n">${i+1}</span><input type="checkbox" id="t3c${i}" data-t3c="${i}" ${t.done?'checked':''} aria-label="完成第 ${i+1} 件"><input type="text" id="t3t${i}" data-t3t="${i}" value="${esc(t.text)}" placeholder="${['最重要的一件事','第二重要','第三重要'][i]}" maxlength="60"></li>`; }).join('');
+  $('note').value = day.note || '';
+}
+function renderInbox(){
+  const tasks = viewInbox(), sampleShown = !state.settings.onboarded && !(state.inbox.tasks||[]).length;
+  $('inboxCount').textContent = tasks.length ? `${tasks.length} 项 · 共 ${dur(tasks.reduce((s,t)=>s+t.mins,0))}` : '';
+  $('inbox').innerHTML = tasks.length ? tasks.map(t => `<li data-cat="${esc(t.cat)}"><span class="ttl">${esc(t.title)} <span class="tag plain">${CATS[t.cat]||''}</span></span><span class="dur">${dur(t.mins)}</span><button class="x" data-del-task="${esc(t.id)}" aria-label="删除 ${esc(t.title)}">×</button></li>`).join('') + (sampleShown ? '<li class="sample-note" style="display:block">以上为示例任务。开始使用后会留在清单里，可随时删除。</li>' : '')
+    : '<li class="empty">清单是空的。把今天想做但还没定时间的事写在这里。</li>';
+  $('autoBtn').disabled = !tasks.length;
+}
+function renderSettings(){
+  if (document.activeElement !== $('wake')) $('wake').value = state.settings.wake;
+  if (document.activeElement !== $('sleep')) $('sleep').value = state.settings.sleep;
+}
+
+/* ---------- editor ---------- */
+function openEditor(item, preset){
+  const isNew = !item;
+  const it = item ? { ...item } : { id: uid(), title:'', start: preset?.start || '09:00', end: preset?.end || '10:00', cat: preset?.cat || 'work', done:false, note:'' };
+  let armedDel = false;
+  const root = $('modalRoot');
+  root.innerHTML = `<div class="modal-wrap" id="mw"><form class="modal" id="mf" role="dialog" aria-modal="true" aria-labelledby="mh" autocomplete="off">
+    <h3 id="mh">${isNew ? '新建时间块' : '编辑时间块'}</h3>
+    <label>做什么<input class="field" id="fTitle" maxlength="60" value="${esc(it.title)}" placeholder="例如：写周报"></label>
+    <div class="two"><label>开始<input class="field" type="time" id="fStart" step="300" value="${it.start}"></label><label>结束<input class="field" type="time" id="fEnd" step="300" value="${it.end === '24:00' ? '23:59' : it.end}"></label></div>
+    <div class="dur-hint" id="fDur"></div>
+    <div><div style="font-size:12.5px;color:var(--muted);margin-bottom:6px">分类</div><div class="chips" id="fCats">${Object.entries(CATS).map(([k,v]) => `<button type="button" class="chip" data-cat="${k}" aria-pressed="${k===it.cat}">${v}</button>`).join('')}</div></div>
+    <label>备注<textarea class="field" id="fNote" rows="2" maxlength="300" placeholder="可选">${esc(it.note||'')}</textarea></label>
+    <div class="err" id="fErr" role="alert"></div>
+    <div class="actions"><span>${isNew ? '' : '<button type="button" class="btn danger" id="fDel">删除</button>'}</span><span class="row"><button type="button" class="btn" id="fCancel">取消</button><button type="submit" class="btn primary">${isNew ? '添加到日程' : '保存修改'}</button></span></div>
+  </form></div>`;
+  const updDur = () => { const s = toMin($('fStart').value), e = toMin($('fEnd').value); $('fDur').textContent = $('fStart').value && $('fEnd').value && e > s ? `时长 ${dur(e - s)}` : ''; };
+  updDur();
+  $('fStart').addEventListener('change', () => { const s = toMin($('fStart').value), e = toMin($('fEnd').value); if (!(e > s)) $('fEnd').value = fmt(Math.min(s + 60, 23*60+59)); updDur(); });
+  $('fEnd').addEventListener('input', updDur);
+  $('fCats').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; it.cat = b.dataset.cat; $('fCats').querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c === b)); });
+  const close = () => { root.innerHTML = ''; document.removeEventListener('keydown', onKey); };
+  const onKey = e => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', onKey);
+  $('mw').addEventListener('mousedown', e => { if (e.target.id === 'mw') close(); });
+  $('fCancel').onclick = close;
+  if (!isNew) $('fDel').onclick = () => {
+    if (!armedDel) { armedDel = true; $('fDel').textContent = '确认删除？'; $('fDel').classList.add('armed'); return; }
+    mutateDay(d => { d.items = d.items.filter(x => x.id !== it.id); }); close(); toast('已删除');
+  };
+  $('mf').addEventListener('submit', e => {
+    e.preventDefault();
+    const title = $('fTitle').value.trim(), s = $('fStart').value, en = $('fEnd').value;
+    if (!title) { $('fErr').textContent = '请写下要做的事。'; $('fTitle').focus(); return; }
+    if (!s || !en) { $('fErr').textContent = '请填写开始和结束时间。'; return; }
+    if (toMin(en) <= toMin(s)) { $('fErr').textContent = '结束时间要晚于开始时间。跨夜的安排请拆成两段。'; return; }
+    const rec = { ...it, title, start: s, end: en === '23:59' ? '24:00' : en, note: $('fNote').value.trim() };
+    mutateDay(d => { const i = d.items.findIndex(x => x.id === rec.id); if (i >= 0) d.items[i] = rec; else d.items.push(rec); });
+    close(); toast(isNew ? '已添加到日程' : '已保存');
+  });
+  setTimeout(() => $('fTitle').focus(), 20);
+}
+
+/* ---------- auto schedule ---------- */
+function autoSchedule(){
+  const tasks = clone(viewInbox());
+  if (!tasks.length) return;
+  const day = viewDay(), items = clone(day.items || []);
+  const wake = toMin(state.settings.wake), sleep = toMin(state.settings.sleep);
+  let from = wake;
+  const tk = todayKey();
+  if (state.date < tk) { toast('这一天已经过去了，换到今天或之后的日期再排。'); return; }
+  if (state.date === tk) from = Math.max(wake, Math.ceil((nowMin() + 5) / 15) * 15);
+  const placed = [], left = [];
+  for (const t of tasks) {
+    const slot = freeSlots(items, from, sleep).find(([s,e]) => e - s >= t.mins);
+    if (!slot) { left.push(t); continue; }
+    const rec = { id: uid(), title: t.title, start: fmt(slot[0]), end: fmt(slot[0] + t.mins), cat: t.cat, done:false, note:'' };
+    items.push(rec); placed.push(rec);
+  }
+  if (!placed.length) { toast('空闲时段不够长，没有能排进去的任务。可以缩短时长或调整作息。'); return; }
+  mutateDay(d => { d.items.push(...placed); });
+  mutateInbox(() => left);
+  toast(`已排入 ${placed.length} 项${left.length ? `，${left.length} 项放不下，留在清单里` : ''}`);
+}
+
+/* ---------- Claude assistant ---------- */
+let aiResult = null;
+async function runAI(){
+  const text = $('aiText').value.trim();
+  if (!text) { $('aiStatus').textContent = '先写几句今天想做的事。'; return; }
+  const day = viewDay(), d = dateOf(state.date), isToday = state.date === todayKey();
+  const existing = (day.sample ? [] : day.items || []).map(i => `${i.start}-${i.end} ${i.title}`).join('；') || '无';
+  const prompt = `你是一位务实的日程规划助手。请为 ${d.getMonth()+1}月${d.getDate()}日（${WEEK[d.getDay()]}）安排时间块。
+作息：${state.settings.wake} 起床，${state.settings.sleep} 就寝，所有安排都要在这个范围内。${isToday ? `现在是 ${fmt(nowMin())}，只安排之后的时间。` : ''}
+已有安排（不要与它们冲突，也不要重复输出）：${existing}
+用户的描述：${text}
+要求：用户明确说了时间的事项按原时间安排；其余合理分配，长时间专注之间留出休息；三餐视情况安排；时间按 15 分钟对齐。
+只输出 JSON，格式：{"items":[{"title":"简短中文标题","start":"HH:MM","end":"HH:MM","cat":"work|study|sport|life|rest"}],"tip":"一句简短、具体的建议"}`;
+  $('aiBtn').disabled = true; $('aiStatus').textContent = 'Claude 正在安排，通常需要十几秒…'; $('aiOut').innerHTML = '';
+  try {
+    const out = await sample.json(prompt, { modelTier: 'default' });
+    const ok = /^([01]\d|2[0-3]):[0-5]\d$/;
+    const list = (out && Array.isArray(out.items) ? out.items : []).filter(i => i && i.title && ok.test(i.start) && (ok.test(i.end) || i.end === '24:00') && toMin(i.end) > toMin(i.start))
+      .map(i => ({ id: uid(), title: String(i.title).slice(0,60), start: i.start, end: i.end, cat: CATS[i.cat] ? i.cat : 'life', done:false, note:'' }));
+    if (!list.length) { $('aiStatus').textContent = '没有得到可用的安排，换个说法再试一次。'; return; }
+    aiResult = list;
+    $('aiStatus').textContent = `生成了 ${list.length} 个时间块，确认后加入日程。`;
+    $('aiOut').innerHTML = list.map(i => `<div class="it" data-cat="${i.cat}"><span class="t" style="font-size:12px;color:var(--muted)">${i.start}–${i.end}</span><span>${esc(i.title)}</span><span class="tag plain">${CATS[i.cat]}</span></div>`).join('')
+      + (out.tip ? `<div class="tip">${esc(String(out.tip).slice(0,200))}</div>` : '')
+      + `<div class="row"><button class="btn primary" id="aiAdd">全部加入日程</button><button class="btn" id="aiDrop">不用了</button></div>`;
+  } catch (e) {
+    const c = e && e.code;
+    if (c === 'not_granted') { $('aiCard').hidden = true; return; }
+    $('aiStatus').textContent = c === 'rate_limited' ? '请求太频繁了，稍等一分钟再试。' : c === 'cancelled' ? '已取消。' : '这次没有生成成功，请稍后再试。';
+  } finally { $('aiBtn').disabled = false; }
+}
+
+/* ---------- events ---------- */
+function go(k){ state.date = k; state.armed = null; firstScroll = true; aiResult = null; $('aiOut').innerHTML = ''; $('aiStatus').textContent = ''; render(); }
+$('prev').onclick = () => go(addDays(state.date, -1));
+$('next').onclick = () => go(addDays(state.date, 1));
+$('todayBtn').onclick = () => go(todayKey());
+$('week').addEventListener('click', e => { const b = e.target.closest('[data-day]'); if (b) go(b.dataset.day); });
+$('addBtn').onclick = () => {
+  const items = viewDay().items || [];
+  const from = state.date === todayKey() ? Math.ceil(nowMin()/30)*30 : toMin(state.settings.wake);
+  const slot = freeSlots(items, Math.min(from, 23*60), 24*60).find(([s,e]) => e - s >= 30);
+  const s = slot ? slot[0] : 9*60;
+  openEditor(null, { start: fmt(s), end: fmt(Math.min(s + 60, slot ? slot[1] : s + 60, 23*60+59)) });
+};
+
+$('tl').addEventListener('click', e => {
+  if (e.target.matches('input[data-toggle]')) {
+    const id = e.target.dataset.toggle, v = e.target.checked;
+    mutateDay(d => { const x = d.items.find(i => i.id === id); if (x) x.done = v; });
+    return;
+  }
+  const blk = e.target.closest('.blk');
+  if (blk) { const it = (viewDay().items||[]).find(i => i.id === blk.dataset.id); if (it) openEditor(it); return; }
+  const r = $('tl').getBoundingClientRect(), base = +$('tl').dataset.base;
+  const m = Math.floor((base + (e.clientY - r.top) / HOUR_PX * 60) / 30) * 30;
+  if (m < 0 || m >= 24*60) return;
+  openEditor(null, { start: fmt(m), end: fmt(Math.min(m + 60, 23*60+59)) });
+});
+$('tl').addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('blk')) { e.preventDefault(); const it = (viewDay().items||[]).find(i => i.id === e.target.dataset.id); if (it) openEditor(it); }
+});
+$('banner').addEventListener('click', e => {
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  if (a.dataset.act === 'keep') { mutateDay(() => {}); toast('示例已保存为你的日程，点时间块即可修改'); }
+  if (a.dataset.act === 'clear-sample') { mutateDay(d => { d.items = []; d.top3 = emptyDay().top3; }); mutateInbox(() => []); toast('已清空，开始规划你的一天吧'); }
+});
+let armTimer;
+$('fill').addEventListener('click', e => {
+  const b = e.target.closest('[data-tpl]'); if (!b) return;
+  const t = b.dataset.tpl, n = (viewDay().items || []).length;
+  const needConfirm = t === 'clear' || n > 0;
+  if (needConfirm && state.armed !== t) { state.armed = t; clearTimeout(armTimer); armTimer = setTimeout(() => { state.armed = null; renderTimeline(); }, 4000); renderTimeline(); return; }
+  state.armed = null; clearTimeout(armTimer);
+  if (t === 'clear') { mutateDay(d => { d.items = []; }); toast('已清空当天安排'); return; }
+  let src;
+  if (t === 'copy') {
+    const prev = state.days[addDays(state.date, -1)];
+    if (!prev || !(prev.items||[]).length) { toast('前一天没有安排可以复制。'); renderTimeline(); return; }
+    src = prev.items.map(i => ({ ...i, id: uid(), done:false }));
+  } else src = TEMPLATES[t].map(([s,e,ti,c]) => ({ id: uid(), start:s, end:e, title:ti, cat:c, done:false, note:'' }));
+  mutateDay(d => { d.items = src; });
+  toast(t === 'copy' ? '已复制前一天的安排' : '已套用模板，点任意时间块可调整');
+});
+$('top3').addEventListener('change', e => {
+  const i = e.target.dataset.t3c; if (i == null) return;
+  const v = e.target.checked;
+  mutateDay(d => { d.top3[i] = { ...(d.top3[i]||{text:''}), done: v }; });
+});
+let t3Timer, noteTimer;
+$('top3').addEventListener('input', e => {
+  const i = e.target.dataset.t3t; if (i == null) return;
+  e.target.closest('li').classList.toggle('done', false);
+  clearTimeout(t3Timer);
+  t3Timer = setTimeout(() => { const vals = [0,1,2].map(j => $('t3t'+j).value); mutateDay(d => { vals.forEach((v,j) => { d.top3[j] = { ...(d.top3[j]||{done:false}), text: v }; }); }); }, 600);
+});
+$('note').addEventListener('input', () => { clearTimeout(noteTimer); const v = $('note').value; noteTimer = setTimeout(() => mutateDay(d => { d.note = v; }), 700); });
+$('inCat').innerHTML = Object.entries(CATS).map(([k,v]) => `<option value="${k}">${v}</option>`).join('');
+$('inboxForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const title = $('inTitle').value.trim(); if (!title) { $('inTitle').focus(); return; }
+  const task = { id: uid(), title, mins: +$('inMins').value, cat: $('inCat').value };
+  mutateInbox(ts => { ts.push(task); });
+  $('inTitle').value = ''; $('inTitle').focus();
+});
+$('inbox').addEventListener('click', e => { const b = e.target.closest('[data-del-task]'); if (!b) return; const id = b.dataset.delTask; mutateInbox(ts => ts.filter(t => t.id !== id)); });
+$('autoBtn').onclick = autoSchedule;
+const saveSettings = () => {
+  const w = $('wake').value, s = $('sleep').value;
+  if (!w || !s || toMin(s) <= toMin(w)) { toast('就寝时间要晚于起床时间。'); renderSettings(); return; }
+  state.settings = { ...state.settings, wake: w, sleep: s };
+  save('meta/settings', state.settings); render();
+};
+$('wake').addEventListener('change', saveSettings);
+$('sleep').addEventListener('change', saveSettings);
+$('aiBtn').onclick = runAI;
+$('aiOut').addEventListener('click', e => {
+  if (e.target.id === 'aiAdd' && aiResult) { const add = aiResult, wasSample = !!viewDay().sample; mutateDay(d => { if (wasSample) d.items = []; d.items.push(...add); }); aiResult = null; $('aiOut').innerHTML = ''; $('aiStatus').textContent = ''; $('aiText').value = ''; toast(`已加入 ${add.length} 个时间块`); }
+  if (e.target.id === 'aiDrop') { aiResult = null; $('aiOut').innerHTML = ''; $('aiStatus').textContent = ''; }
+});
+
+let toastTimer;
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 2800); }
+
+/* keep "now" fresh; rolls over to the new day at midnight when viewing today */
+let lastToday = todayKey();
+setInterval(() => {
+  const tk = todayKey();
+  if (tk !== lastToday) { if (state.date === lastToday) state.date = tk; lastToday = tk; render(); return; }
+  if (state.date === tk) { renderTimeline(); renderStats(); }
+}, 60000);
+
+readLocal();
+render();
+connect();
+})();
+</script>
