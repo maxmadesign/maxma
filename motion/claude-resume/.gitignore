@@ -1,0 +1,5 @@
+node_modules/
+frames/
+out/*
+!out/claude-motion-resume.mp4
+!out/poster.png
