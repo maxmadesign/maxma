@@ -93,8 +93,9 @@ try {
 
 if (flag('encode')) {
   const wav = path.join(OUT, 'score.wav');
-  const hasAudio = fs.existsSync(wav);
-  if (!hasAudio && !flag('no-audio')) {
+  const noAudio = flag('no-audio');
+  const hasAudio = !noAudio && fs.existsSync(wav);
+  if (!hasAudio && !noAudio) {
     console.error('out/score.wav is missing — run `python audio/score.py` first (or pass --no-audio for a silent encode).');
     process.exit(1);
   }
