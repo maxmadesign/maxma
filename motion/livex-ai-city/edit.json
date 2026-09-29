@@ -1,0 +1,33 @@
+{
+  "fps": 24,
+  "size": [1920, 1080],
+  "base": "https://d8j0ntlcm91z4.cloudfront.net/user_2w7VNEW9k4s7fv62h3msk1ELBDx/",
+  "shots": [
+    { "shot": "1A hands + ticket", "file": "hf_20260929_064741_24566afc-3e4f-4af8-944b-04aa7d9fe9f7.mp4", "in": 0.5, "frames": 36 },
+    { "shot": "1B grandmother in lobby", "file": "hf_20260929_064451_71c38866-9847-4e66-8801-cee079a2fcd3.mp4", "in": 1.0, "frames": 60 },
+    { "shot": "2A Lyra close-up", "file": "hf_20260929_064452_c55741be-0dad-46ef-8be5-427158f57f11.mp4", "in": 0.3, "frames": 48 },
+    { "shot": "2B grandmother shows ticket", "file": "hf_20260929_064742_8436da3e-6785-4e84-92bd-221fc0e4f3b5.mp4", "in": 1.0, "frames": 48 },
+    { "shot": "2C Lyra (later in 2A)", "file": "hf_20260929_064452_c55741be-0dad-46ef-8be5-427158f57f11.mp4", "in": 2.6, "frames": 48 },
+    { "shot": "3A Gateway hero", "file": "hf_20260929_064452_bf4c98db-8b50-4db7-99b0-a0734667174b.mp4", "in": 0.5, "frames": 96 },
+    { "shot": "4A revolving door X", "file": "hf_20260929_064742_205c32ac-e51c-4f8f-9953-d8b458811fb3.mp4", "in": 1.0, "frames": 36 },
+    { "shot": "4B metro Portal", "file": "hf_20260929_064500_f3ea8c8d-f86c-446b-bc0a-ca2390e66735.mp4", "in": 1.0, "frames": 60 },
+    { "shot": "5A/5B plaza Paragon", "file": "hf_20260929_064452_8a93c812-ef48-4a4d-80de-79747e8f3985.mp4", "in": 0.5, "frames": 96 },
+    { "shot": "6.1 mall Gateway", "file": "hf_20260929_064742_bfeb12fc-92ef-4ab5-a190-c0f8e8b95a76.mp4", "in": 1.2, "frames": 12 },
+    { "shot": "6.2 hospital Portal", "file": "hf_20260929_064741_690b0446-4520-4854-9edf-f0c7d4b72eb5.mp4", "in": 1.2, "frames": 12 },
+    { "shot": "6.3 campus Paragon", "file": "hf_20260929_064741_c5913016-2f25-4f78-870c-070d7a345631.mp4", "in": 1.2, "frames": 12 },
+    { "shot": "6.4 corporate lobby Gateway", "file": "hf_20260929_064804_648f83e6-821b-49b8-a85f-882c50789730.mp4", "in": 1.2, "frames": 12 },
+    { "shot": "6.5 hotel elevators Portal", "file": "hf_20260929_064804_f2d616a8-848f-436d-bbf5-35127f8d4640.mp4", "in": 1.2, "frames": 12 },
+    { "shot": "6.6 shopping street Paragon", "file": "hf_20260929_064804_83212641-1c3b-4cec-9c28-d614fdc834ac.mp4", "in": 1.2, "frames": 12 },
+    { "shot": "6.7 convention Gateway", "file": "hf_20260929_064804_944e5eb1-8b53-4937-a786-a6c293b71d08.mp4", "in": 1.2, "frames": 12 },
+    { "shot": "7A grandmother cheers", "file": "hf_20260929_064451_529ef47b-8e54-4e14-b24f-67218462afa3.mp4", "in": 0.8, "frames": 48 },
+    { "shot": "7B aerial city + 7C end card", "file": "hf_20260929_064452_9fc4f0a3-19c0-4da6-9d2f-31f8040e77db.mp4", "in": 0.0, "frames": 60 }
+  ],
+  "captions": [
+    { "from": 4.25, "to": 5.85, "text": "Hello! Here for the game?" },
+    { "from": 6.2, "to": 7.85, "text": "My granddaughter plays in the final tonight." },
+    { "from": 8.1, "to": 9.9, "text": "Seven o'clock. You'll make it. I'll show you the way." },
+    { "from": 15.9, "to": 17.85, "text": "Exit B. Two minutes." },
+    { "from": 19.4, "to": 21.85, "text": "Section 104. She's warming up." }
+  ],
+  "endCard": { "dim": 28.3, "logo": 28.6, "tagline": 29.0, "text": "AI meets you. Where life happens." }
+}

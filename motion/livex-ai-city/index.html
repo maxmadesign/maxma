@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LiveX AI City · Animatic</title>
+    <style>
+      /* CJK: Noto Sans SC (OFL) subset to the animatic's Chinese copy — rebuild with fonts/subset-cjk.py after editing it */
+      @font-face { font-family: 'Noto Sans SC'; font-weight: 400; src: url(fonts/noto-sans-sc-animatic-400-normal.woff2) format('woff2'); }
+      @font-face { font-family: 'Noto Sans SC'; font-weight: 500; src: url(fonts/noto-sans-sc-animatic-500-normal.woff2) format('woff2'); }
+      @font-face { font-family: 'Inter Tight'; font-weight: 500; src: url(fonts/inter-tight-latin-500-normal.woff2) format('woff2'); }
+      @font-face { font-family: 'Inter Tight'; font-weight: 600; src: url(fonts/inter-tight-latin-600-normal.woff2) format('woff2'); }
+      @font-face { font-family: 'Inter Tight'; font-weight: 700; src: url(fonts/inter-tight-latin-700-normal.woff2) format('woff2'); }
+      @font-face { font-family: 'Inter Tight'; font-weight: 800; src: url(fonts/inter-tight-latin-800-normal.woff2) format('woff2'); }
+      @font-face { font-family: 'Instrument Serif'; font-style: italic; src: url(fonts/instrument-serif-latin-400-italic.woff2) format('woff2'); }
+      @font-face { font-family: 'JetBrains Mono'; font-weight: 500; src: url(fonts/jetbrains-mono-latin-500-normal.woff2) format('woff2'); }
+      @font-face { font-family: 'JetBrains Mono'; font-weight: 600; src: url(fonts/jetbrains-mono-latin-500-normal.woff2) format('woff2'); }
+      html, body { margin: 0; background: #000; }
+      canvas { display: block; width: 100vw; height: auto; }
+      body.render canvas { width: 1920px; height: 1080px; }
+    </style>
+  </head>
+  <body>
+    <canvas id="c" width="1920" height="1080"></canvas>
+    <!-- fresh checkout: score.wav is a build output, so fall back to the committed Opus copy -->
+    <audio id="audio" preload="auto" loop>
+      <source src="out/score.wav" type="audio/wav" />
+      <source src="out/score.webm" type="audio/webm; codecs=opus" />
+    </audio>
+    <script type="module">
+      import { FPS, DURATION, setMeasureContext } from './src/engine.js';
+      import { renderFrame, cues, IMG, IMAGES } from './src/animatic.js';
+      const canvas = document.getElementById('c');
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      const params = new URLSearchParams(location.search);
+      if (params.has('render')) document.body.classList.add('render');
+      await Promise.all(['500 20px "Inter Tight"','600 20px "Inter Tight"','700 20px "Inter Tight"','800 20px "Inter Tight"','italic 400 20px "Instrument Serif"','500 20px "JetBrains Mono"','400 20px "Noto Sans SC"','500 20px "Noto Sans SC"'].map((f) => document.fonts.load(f)));
+      await Promise.all(IMAGES.map((n) => new Promise((ok, bad) => { const i = new Image(); i.onload = () => { IMG[n] = i; ok(); }; i.onerror = bad; i.src = `assets/${n}.png`; })));
+      setMeasureContext(ctx);
+      let acc = null;
+      window.renderAt = (t) => renderFrame(ctx, t);
+      window.renderBlurred = (t, n = 6, shutter = 0.5) => {
+        const w = canvas.width, h = canvas.height;
+        if (!acc) acc = new Float32Array(w * h * 4);
+        acc.fill(0);
+        for (let i = 0; i < n; i++) { renderFrame(ctx, Math.max(0, t + ((i + 0.5) / n - 0.5) * shutter / 24)); const d = ctx.getImageData(0, 0, w, h).data; for (let k = 0; k < d.length; k++) acc[k] += d[k]; }
+        const img = ctx.createImageData(w, h); for (let k = 0; k < img.data.length; k++) img.data[k] = acc[k] / n + 0.5; ctx.putImageData(img, 0, 0);
+      };
+      window.cues = cues;
+      window.frameCount = Math.round(DURATION * 24);
+      window.__ready = true;
+      const t = parseFloat(params.get('t') || '0');
+      renderFrame(ctx, t);
+      if (!params.has('render')) {
+        const audio = document.getElementById('audio'); let t0 = performance.now();
+        canvas.addEventListener('click', () => { t0 = performance.now(); audio.currentTime = 0; audio.play().catch(() => {}); });
+        // while the (looping) soundtrack plays it is the clock, so every pass stays in sync with it
+        const loop = (now) => { renderFrame(ctx, audio.paused ? ((now - t0) / 1000) % DURATION : audio.currentTime % DURATION); requestAnimationFrame(loop); };
+        requestAnimationFrame(loop);
+      }
+    </script>
+  </body>
+</html>
