@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>LiveX AI City · Animatic</title>
     <style>
+      /* CJK: Noto Sans SC (OFL) subset to the animatic's Chinese copy — rebuild with fonts/subset-cjk.py after editing it */
+      @font-face { font-family: 'Noto Sans SC'; font-weight: 400; src: url(fonts/noto-sans-sc-animatic-400-normal.woff2) format('woff2'); }
+      @font-face { font-family: 'Noto Sans SC'; font-weight: 500; src: url(fonts/noto-sans-sc-animatic-500-normal.woff2) format('woff2'); }
       @font-face { font-family: 'Inter Tight'; font-weight: 500; src: url(fonts/inter-tight-latin-500-normal.woff2) format('woff2'); }
       @font-face { font-family: 'Inter Tight'; font-weight: 600; src: url(fonts/inter-tight-latin-600-normal.woff2) format('woff2'); }
       @font-face { font-family: 'Inter Tight'; font-weight: 700; src: url(fonts/inter-tight-latin-700-normal.woff2) format('woff2'); }
@@ -31,7 +34,7 @@
       const ctx = canvas.getContext('2d', { willReadFrequently: true });
       const params = new URLSearchParams(location.search);
       if (params.has('render')) document.body.classList.add('render');
-      await Promise.all(['500 20px "Inter Tight"','600 20px "Inter Tight"','700 20px "Inter Tight"','800 20px "Inter Tight"','italic 400 20px "Instrument Serif"','500 20px "JetBrains Mono"'].map((f) => document.fonts.load(f)));
+      await Promise.all(['500 20px "Inter Tight"','600 20px "Inter Tight"','700 20px "Inter Tight"','800 20px "Inter Tight"','italic 400 20px "Instrument Serif"','500 20px "JetBrains Mono"','400 20px "Noto Sans SC"','500 20px "Noto Sans SC"'].map((f) => document.fonts.load(f)));
       await Promise.all(IMAGES.map((n) => new Promise((ok, bad) => { const i = new Image(); i.onload = () => { IMG[n] = i; ok(); }; i.onerror = bad; i.src = `assets/${n}.png`; })));
       setMeasureContext(ctx);
       let acc = null;

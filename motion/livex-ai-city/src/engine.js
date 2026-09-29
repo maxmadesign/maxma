@@ -137,9 +137,9 @@ export function wcag(ratio) {
 // ---------------------------------------------------------------- type
 
 export const F = {
-  sans: (s, w = 700) => `${w} ${s}px "Inter Tight"`,
-  serif: (s) => `italic 400 ${s}px "Instrument Serif"`,
-  mono: (s, w = 500) => `${w} ${s}px "JetBrains Mono"`,
+  sans: (s, w = 700) => `${w} ${s}px "Inter Tight", "Noto Sans SC"`,
+  serif: (s) => `italic 400 ${s}px "Instrument Serif", "Noto Sans SC"`,
+  mono: (s, w = 500) => `${w} ${s}px "JetBrains Mono", "Noto Sans SC"`,
 };
 
 let mctx = null;

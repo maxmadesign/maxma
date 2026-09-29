@@ -100,7 +100,7 @@ function subtitle(ctx, t, t0, t1, zh, en) {
   ctx.fillStyle = bg; ctx.fillRect(FR.x, y - 90, FR.w, FR.y + FR.h - y + 90);
   ctx.shadowColor = 'rgba(0,0,0,0.8)';
   ctx.shadowBlur = 12;
-  text(ctx, zh, CX, y, { font: `500 38px "Noto Sans SC", "WenQuanYi Zen Hei", sans-serif`, color: '#ffffff', align: 'center', alpha: a });
+  text(ctx, zh, CX, y, { font: `500 38px "Noto Sans SC", sans-serif`, color: '#ffffff', align: 'center', alpha: a });
   text(ctx, en, CX, y + 44, { font: F.serif(32), color: '#f1ece4', align: 'center', alpha: a * 0.9 });
   ctx.restore();
 }
@@ -172,7 +172,7 @@ function sc01(ctx, t) {
       person(ctx, px, FR.y + FR.h - 40 + (i % 3) * 20, 470 + (i % 3) * 40, { dark: true, alpha: 0.85 });
     }
     person(ctx, CX + 30 * Math.sin(u * 3), FR.y + FR.h - 60, 430 * (1 + 0.06 * u), { tote: true });
-    text(ctx, '请问……', CX + 90, FR.y + 360, { font: `400 30px "WenQuanYi Zen Hei", sans-serif`, color: '#f5e8d8', alpha: prog(t, 2.6, 2.9) * (1 - prog(t, 3.7, 3.95)) });
+    text(ctx, '请问……', CX + 90, FR.y + 360, { font: `400 30px "Noto Sans SC", sans-serif`, color: '#f5e8d8', alpha: prog(t, 2.6, 2.9) * (1 - prog(t, 3.7, 3.95)) });
     note(ctx, '1B · 50mm 手持 · 人流经过，没人停下');
   }
 }
@@ -378,7 +378,7 @@ function sc06(ctx, t) {
     person(ctx, CX, FR.y + FR.h + 60, 640, { tote: true });
   }
   text(ctx, en, 64, FR.y + 110, { font: F.sans(64, 800), color: '#fff', tr: 2 });
-  text(ctx, `${zh} · ${who}`, 66, FR.y + 150, { font: `400 24px "WenQuanYi Zen Hei", sans-serif`, color: 'rgba(255,255,255,0.8)' });
+  text(ctx, `${zh} · ${who}`, 66, FR.y + 150, { font: `400 24px "Noto Sans SC", sans-serif`, color: 'rgba(255,255,255,0.8)' });
   note(ctx, `6 · 蒙太奇 ${k + 1}/8 · 每 0.5 秒一拍 · 同一个 Lyra`);
 }
 
@@ -462,7 +462,7 @@ function hud(ctx, t) {
   SHOTS.forEach((s, i) => { if (t >= s[0]) si = i; });
   const sec = Math.floor(t), fr = Math.floor((t - sec) * 24);
   spans(ctx, [
-    { s: `${SHOTS[si][1]}  ${SHOTS[si][2]}`, font: `400 16px "JetBrains Mono", "WenQuanYi Zen Hei", monospace`, color: '#cfcfcf', pad: 24 },
+    { s: `${SHOTS[si][1]}  ${SHOTS[si][2]}`, font: `400 16px "JetBrains Mono", "Noto Sans SC", monospace`, color: '#cfcfcf', pad: 24 },
     { s: `00:${String(sec).padStart(2, '0')}:${String(fr).padStart(2, '0')}`, font: F.mono(16, 600), color: '#fff', tr: 1 },
   ], W - 48, 80, { align: 'right' });
   // scale progression
