@@ -64,7 +64,8 @@ try {
   }
 
   if (flag('frames')) {
-    fs.rmSync(FRAMES_DIR, { recursive: true, force: true });
+    // a full render starts clean; a --from/--to chunk keeps the frames earlier chunks wrote
+    if (!args.includes('--from') && !args.includes('--to')) fs.rmSync(FRAMES_DIR, { recursive: true, force: true });
     fs.mkdirSync(FRAMES_DIR, { recursive: true });
     const probe = await openPage(browser, port);
     const total = await probe.evaluate(() => window.frameCount);

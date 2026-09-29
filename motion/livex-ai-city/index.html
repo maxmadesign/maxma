@@ -19,7 +19,11 @@
   </head>
   <body>
     <canvas id="c" width="1920" height="1080"></canvas>
-    <audio id="audio" src="out/score.wav" preload="auto"></audio>
+    <!-- fresh checkout: score.wav is a build output, so fall back to the committed Opus copy -->
+    <audio id="audio" preload="auto" loop>
+      <source src="out/score.wav" type="audio/wav" />
+      <source src="out/score.webm" type="audio/webm; codecs=opus" />
+    </audio>
     <script type="module">
       import { FPS, DURATION, setMeasureContext } from './src/engine.js';
       import { renderFrame, cues, IMG, IMAGES } from './src/animatic.js';
@@ -47,7 +51,8 @@
       if (!params.has('render')) {
         const audio = document.getElementById('audio'); let t0 = performance.now();
         canvas.addEventListener('click', () => { t0 = performance.now(); audio.currentTime = 0; audio.play().catch(() => {}); });
-        const loop = (now) => { renderFrame(ctx, ((now - t0) / 1000) % DURATION); requestAnimationFrame(loop); };
+        // while the (looping) soundtrack plays it is the clock, so every pass stays in sync with it
+        const loop = (now) => { renderFrame(ctx, audio.paused ? ((now - t0) / 1000) % DURATION : audio.currentTime % DURATION); requestAnimationFrame(loop); };
         requestAnimationFrame(loop);
       }
     </script>

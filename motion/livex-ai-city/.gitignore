@@ -2,3 +2,4 @@ node_modules
 frames/
 out/*
 !out/livex-ai-city-animatic.mp4
+!out/score.webm
