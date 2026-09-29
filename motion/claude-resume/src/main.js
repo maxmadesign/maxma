@@ -126,7 +126,9 @@ function preview(start) {
     show(scrub.value / FPS);
   });
   addEventListener('keydown', (e) => {
-    if (e.code === 'Space') { e.preventDefault(); toggle(); }
+    // let focused controls keep their native Space activation (Play still toggles via its click handler)
+    const control = e.target.closest?.('button, a, select, textarea, input:not([type=range])');
+    if (e.code === 'Space' && !control) { e.preventDefault(); toggle(); }
     if (e.code === 'ArrowRight' || e.code === 'ArrowLeft') {
       if (playing) toggle();
       const step = (e.shiftKey ? FPS / 2 : 1) * (e.code === 'ArrowRight' ? 1 : -1);
