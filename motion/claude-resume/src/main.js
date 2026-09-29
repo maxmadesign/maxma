@@ -69,7 +69,7 @@ function preview(start) {
   const show = (time) => {
     t = ((time % DURATION) + DURATION) % DURATION;
     renderFrame(ctx, t);
-    const f = Math.floor(t * FPS);
+    const f = Math.floor(t * FPS + 1e-6); // epsilon: (k / FPS) * FPS can land just under k
     scrub.value = f;
     tc.textContent = `${t.toFixed(3).padStart(6, '0')} s · F${String(f).padStart(4, '0')}`;
   };
@@ -130,6 +130,7 @@ function preview(start) {
     const control = e.target.closest?.('button, a, select, textarea, input:not([type=range])');
     if (e.code === 'Space' && !control) { e.preventDefault(); toggle(); }
     if (e.code === 'ArrowRight' || e.code === 'ArrowLeft') {
+      e.preventDefault(); // a focused scrubber would otherwise also apply its native step
       if (playing) toggle();
       const step = (e.shiftKey ? FPS / 2 : 1) * (e.code === 'ArrowRight' ? 1 : -1);
       show(t + step / FPS);
